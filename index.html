@@ -1,0 +1,54 @@
+<script src="https://cdn.jsdelivr.net/gh/netizenorg/netnet-standard-library/build/nn.min.js"></script>
+<script>
+  /* global nn */
+  
+  // replace this with your own GIF
+  const gifURL = 'pandaandbaby.gif'
+  // replace this with a color that compliments your GIF
+  const bgColor = '#e585ca'
+  
+  function createGif (x, y, w, h, url) {
+    nn.create('img')
+      .set({ src: `${url}#${nn.random()}` })
+      .css({
+        position: 'absolute',
+        left: x + 'px', //either way works
+        top: `${y}px`, //either way works
+        width: w + 'px',
+        height: h + 'px',
+        border: 'solid'
+      })
+      .addTo('body')
+  }
+  
+  function setup () {
+    nn.get('body').css({
+      'background-color': bgColor,
+      'overflow': 'hidden'
+    })
+    
+    const w = 124
+    const h = 96
+    const offset = w * 0.75
+    const spacing = w - offset
+    
+    const numColumns = Math.ceil(nn.width / spacing)
+    const numRows = nn.height * 0.75 / spacing
+    for (let r = 0; r < numRows; r++) {
+      for (let i = 0; i < numColumns; i++) {
+
+        // const x = nn.width / 2 - w / 2
+        // const y = nn.height / 2 - h / 2
+        // const x = nn.random(0, nn.width)
+        // const y = nn.random(0, nn.height)
+        const x = i * spacing - offset
+        const y = r * spacing - offset
+        createGif(x, y, w, h, gifURL)
+      }
+    }
+  }
+  
+  nn.on('load', setup)
+  // nn.on('resize', setup)
+  
+</script>
