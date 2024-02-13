@@ -31,6 +31,18 @@
     const d2 = Math.max(0.001, Math.sqrt(x2 * x2 + y2 * y2));
     return Math.asin((x1 / d1) * (y2 / d2) - (y1 / d1) * (x2 / d2));
   }
+  // function getAngleBetween(cx, cy, ox, oy, mx, my) {
+  //   var x1 = ox - cx;
+  //   var y1 = oy - cy;
+  //   var x2 = mx - cx;
+  //   var y2 = my - cy;
+  //   // max to prevent div by zero
+  //   var d1 = Math.max(0.001, Math.sqrt(x1 * x1 + y1 * y1));
+  //   var d2 = Math.max(0.001, Math.sqrt(x2 * x2 + y2 * y2));
+  //   const result = Math.asin((x1 / d1) * (y2 / d2) - (y1 / d1) * (x2 / d2))
+  //   // console.log(result * 180 / Math.PI);
+  //   return result;
+  // }
   function getCursorAngleAroundCenter (event) {
     
     // mouseEventsPassed++;
@@ -43,7 +55,7 @@
     const mouseX = event.clientX;
     const mouseY = event.clientY;
     const angle = Math.atan2(mouseX - centerX, mouseY - centerY);
-    console.log(nn.angleBtw(centerX, centerY, mouseX, mouseY));
+    // console.log(nn.angleBtw(centerX, centerY, mouseX, mouseY));
     // const angleDelta = Math.abs(angle) - Math.abs(previousAngle);
     const angleDelta = getAngleBetween(centerX, centerY, previousMousePos[0], previousMousePos[1], mouseX, mouseY) * 180 / Math.PI;
     // console.log(angleDelta, angle, previousAngle);
@@ -54,9 +66,9 @@
     // if (angle - previousAngle > 0) {
     //   console.log(angleDelta, angle, previousAngle);
     // }
-    // console.log(angleDelta, angle, previousAngle);
+    console.log(angleDelta, angle, previousAngle);
     previousAngle = angle;
-    previousMousePox = [mouseX, mouseY];
+    previousMousePos = [mouseX, mouseY];
   }
   function setInitialAngle (event) {
     document.removeEventListener('mousemove', setInitialAngle);
