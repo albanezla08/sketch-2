@@ -45,6 +45,20 @@
   let currentSheetPercentage = 0;
   /* Seal circle */
   const numSeals = 8;
+  const sealCircles = [
+    {
+      elem: undefined, // will be set in setup
+      rotated: 0,
+      numSeals: 8,
+      radius: 300
+    },
+    {
+      elem: undefined,
+      rotated: 0,
+      numSeals: 16,
+      radius: 600
+    }
+  ]
   /* Circular mouse movement tracking */
   let previousMousePos;
   let rotationTotal = 0;
@@ -58,19 +72,25 @@
   }
 
   /* Seal circle functions */
-  function createSealCircle (numSeals, parent) {
+  function createSealCircle (numSeals, radius, parent) {
+    const ringDisplay = document.createElement('div');
+    ringDisplay.classList.add('ring-display');
     for (let i = 0; i < numSeals; i++) {
-      const distance = 300;
       const rotateAmount = 2 * Math.PI / numSeals * i;
       const sealElem = document.createElement('div');
       sealElem.classList.add('seal-container');
-      // sealElem.style.transform += `translate(-50%, -50%) rotate(${rotateAmount}deg)`;
       sealElem.style.transform =
         `translate(-50%, -50%) \
-        translate(${distance * Math.cos(rotateAmount)}px, ${distance * Math.sin(rotateAmount)}px)\
+        translate(${radius * Math.cos(rotateAmount)}px, ${radius * Math.sin(rotateAmount)}px)\
         rotate(${rotateAmount + Math.PI / 2}rad)`;
-      parent.appendChild(sealElem);
+      ringDisplay.appendChild(sealElem);
+      parent.appendChild(ringDisplay);
     }
+    return ringDisplay;
+  }
+  function rotateSealCircle (sealCircle, rotateAmount) {
+    sealCircle.rotated += rotateAmount;
+    sealCircle.element.style.transform = `rotate(${sealCircle.rotated}deg)`;
   }
 
   /* Stole this function from https://stackoverflow.com/questions/49147241/how-to-detect-if-mouse-is-moving-in-clockwise-direction */
@@ -108,12 +128,6 @@
       stepGifFrame(stepPercent);
       rotationTotal = 0;
     }
-    
-    // if (angleDelta > 0.01) {
-    //   stepGifFrame(stepPercent * -1);
-    // } else if (angleDelta < -0.01) {
-    //   stepGifFrame(stepPercent);
-    // }
   }
   function setInitialAngle (event) {
     document.removeEventListener('mousemove', setInitialAngle);
@@ -125,7 +139,11 @@
   
   function setup () {
     centerGif = document.querySelector('.seal-container');
-    createSealCircle(numSeals, document.querySelector('.ring-display'));
+    const body = document.querySelector('body');
+    // createSealCircle(numSeals, document.querySelector('body'));
+    sealCircles.forEach(sealCircle => {
+      sealCircle.elem = createSealCircle(sealCircle.numSeals, sealCircle.radius, body);
+    });
     document.addEventListener('mousemove', setInitialAngle);
   }
   
