@@ -1,11 +1,38 @@
 <body>
-  <p>O</p>
+  <div class="seal-container paused">
+<!--     <img src="sheet-spinning-seal.png"> -->
+  </div>
 </body>
 <style>
   p {
     position: fixed;
     left: 50%;
     top: 50%;
+  }
+/* "Pausable gif" effect stolen from Junjun Zhang on https://codepen.io/zjun/pen/dGPqzQ */
+  @keyframes like-gif {
+    0% {
+      background-position: 0%;
+    }
+    100% {
+      background-position: 100%;
+    }
+  }
+  .paused {
+    animation-play-state: paused;
+  }
+  .seal-container {
+    width: 200px;
+    height: 207px;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background-image: url("sheet-spinning-seal.png");
+    animation-name: like-gif;
+    animation-timing-function: steps(34);
+    animation-duration: 1.5s;
+    animation-iteration-count: infinite;
   }
 </style>
 <script src="https://cdn.jsdelivr.net/gh/netizenorg/netnet-standard-library/build/nn.min.js"></script>
@@ -15,8 +42,7 @@
   /*https://stackoverflow.com/questions/49147241/how-to-detect-if-mouse-is-moving-in-clockwise-direction*/
   let previousAngle;
   let previousMousePos;
-  // const mouseEventBuffer = 0; // 5 mouse events occur before comparing current and previous angle
-  // let mouseEventsPassed = 0;
+  let rotationTotal = 0;
   /* Stole this function from https://stackoverflow.com/questions/49147241/how-to-detect-if-mouse-is-moving-in-clockwise-direction */
   // cx,cy center of rotation
   // ox,oy old position of mouse
@@ -31,42 +57,17 @@
     const d2 = Math.max(0.001, Math.sqrt(x2 * x2 + y2 * y2));
     return Math.asin((x1 / d1) * (y2 / d2) - (y1 / d1) * (x2 / d2));
   }
-  // function getAngleBetween(cx, cy, ox, oy, mx, my) {
-  //   var x1 = ox - cx;
-  //   var y1 = oy - cy;
-  //   var x2 = mx - cx;
-  //   var y2 = my - cy;
-  //   // max to prevent div by zero
-  //   var d1 = Math.max(0.001, Math.sqrt(x1 * x1 + y1 * y1));
-  //   var d2 = Math.max(0.001, Math.sqrt(x2 * x2 + y2 * y2));
-  //   const result = Math.asin((x1 / d1) * (y2 / d2) - (y1 / d1) * (x2 / d2))
-  //   // console.log(result * 180 / Math.PI);
-  //   return result;
-  // }
+  
   function getCursorAngleAroundCenter (event) {
-    
-    // mouseEventsPassed++;
-    // if (mouseEventsPassed < mouseEventBuffer) {
-    //   return;
-    // }
-    // mouseEventsPassed = 0;
     const centerX = window.innerWidth / 2;
     const centerY = window.innerHeight / 2;
     const mouseX = event.clientX;
     const mouseY = event.clientY;
     const angle = Math.atan2(mouseX - centerX, mouseY - centerY);
-    // console.log(nn.angleBtw(centerX, centerY, mouseX, mouseY));
-    // const angleDelta = Math.abs(angle) - Math.abs(previousAngle);
     const angleDelta = getAngleBetween(centerX, centerY, previousMousePos[0], previousMousePos[1], mouseX, mouseY) * 180 / Math.PI;
-    // console.log(angleDelta, angle, previousAngle);
-    // if (Math.abs(angleDelta) > 2) {
-    //   console.log(angleDelta, angle, previousAngle);
-    // }
-    // this would mean it wasn't moving clockwise, with the major exception of when it passes the top of the circle
-    // if (angle - previousAngle > 0) {
-    //   console.log(angleDelta, angle, previousAngle);
-    // }
     console.log(angleDelta, angle, previousAngle);
+    rotationTotal += angleDelta;
+    console.log("total: ", rotationTotal);
     previousAngle = angle;
     previousMousePos = [mouseX, mouseY];
   }
