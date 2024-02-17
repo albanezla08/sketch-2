@@ -44,19 +44,27 @@
   const stepPercent = 100 / 34;
   let currentSheetPercentage = 0;
   /* Seal circle */
-  const numSeals = 8;
   const sealCircles = [
     {
       elem: undefined, // will be set in setup
       rotated: 0,
       numSeals: 8,
-      radius: 300
+      radius: 300,
+      rotateAmount: 1
     },
     {
       elem: undefined,
       rotated: 0,
       numSeals: 16,
-      radius: 600
+      radius: 600,
+      rotateAmount: 0.8
+    },
+    {
+      elem: undefined,
+      rotated: 0,
+      numSeals: 24,
+      radius: 900,
+      rotateAmount: 0.5
     }
   ]
   /* Circular mouse movement tracking */
@@ -66,6 +74,7 @@
 
   let centerGif;
   
+  /* Sprite sheet animation functions */
   function stepGifFrame (percentChange) {
     centerGif.style.backgroundPosition = (currentSheetPercentage + percentChange) + '%';
     currentSheetPercentage += percentChange;
@@ -88,9 +97,14 @@
     }
     return ringDisplay;
   }
-  function rotateSealCircle (sealCircle, rotateAmount) {
-    sealCircle.rotated += rotateAmount;
-    sealCircle.element.style.transform = `rotate(${sealCircle.rotated}deg)`;
+  function rotateSealCircle (sealCircle, rotateModifier) {
+    sealCircle.rotated += sealCircle.rotateAmount * rotateModifier;
+    sealCircle.elem.style.transform = `rotate(${sealCircle.rotated}deg)`;
+  }
+  function rotateAllSealCircles (rotateModifier) {
+    sealCircles.forEach(sealCircle => {
+      rotateSealCircle(sealCircle, rotateModifier);
+    })
   }
 
   /* Stole this function from https://stackoverflow.com/questions/49147241/how-to-detect-if-mouse-is-moving-in-clockwise-direction */
@@ -122,11 +136,13 @@
     rotationTotal += angleDelta;
 
     if (rotationTotal > rotationThreshold) {
+      rotationTotal = 0;
       stepGifFrame(stepPercent * -1);
-      rotationTotal = 0;
+      rotateAllSealCircles(1);
     } else if (rotationTotal < rotationThreshold * -1) {
-      stepGifFrame(stepPercent);
       rotationTotal = 0;
+      stepGifFrame(stepPercent);
+      rotateAllSealCircles(-1);
     }
   }
   function setInitialAngle (event) {
@@ -140,7 +156,6 @@
   function setup () {
     centerGif = document.querySelector('.seal-container');
     const body = document.querySelector('body');
-    // createSealCircle(numSeals, document.querySelector('body'));
     sealCircles.forEach(sealCircle => {
       sealCircle.elem = createSealCircle(sealCircle.numSeals, sealCircle.radius, body);
     });
