@@ -1,6 +1,5 @@
 <body>
-  <div class="seal-container paused">
-<!--     <img src="sheet-spinning-seal.png"> -->
+  <div class="seal-container">
   </div>
 </body>
 <style>
@@ -21,6 +20,9 @@
   .paused {
     animation-play-state: paused;
   }
+  .reversed {
+    animation-direction: reverse;
+  }
   .seal-container {
     width: 200px;
     height: 207px;
@@ -35,14 +37,25 @@
     animation-iteration-count: infinite;
   }
 </style>
-<script src="https://cdn.jsdelivr.net/gh/netizenorg/netnet-standard-library/build/nn.min.js"></script>
 <script>
-  /*Credit for clockwise mouse detection logic comes from these two sources*/
-  /*https://gamedev.stackexchange.com/questions/158964/detect-how-much-mouse-has-rotated-in-a-circle-around-an-xy-point*/
-  /*https://stackoverflow.com/questions/49147241/how-to-detect-if-mouse-is-moving-in-clockwise-direction*/
-  let previousAngle;
+
   let previousMousePos;
   let rotationTotal = 0;
+  let centerGif;
+  let isMouseMoving = false;
+  let pauseRequest;
+  
+  function playGifClockwise () {
+    // centerGif.classList.remove('paused');
+  }
+  function playGifCounterclockwise () {
+    centerGif.classList.add('reversed');
+    centerGif.classList.remove('paused');
+  }
+  function pauseGif () {
+    centerGif.classList.add('paused');
+  }
+
   /* Stole this function from https://stackoverflow.com/questions/49147241/how-to-detect-if-mouse-is-moving-in-clockwise-direction */
   // cx,cy center of rotation
   // ox,oy old position of mouse
@@ -58,29 +71,53 @@
     return Math.asin((x1 / d1) * (y2 / d2) - (y1 / d1) * (x2 / d2));
   }
   
-  function getCursorAngleAroundCenter (event) {
+  /*Credit for clockwise mouse detection logic comes from these two sources*/
+  /*https://gamedev.stackexchange.com/questions/158964/detect-how-much-mouse-has-rotated-in-a-circle-around-an-xy-point*/
+  /*https://stackoverflow.com/questions/49147241/how-to-detect-if-mouse-is-moving-in-clockwise-direction*/
+  function checkAngleChange (event) {
+    isMouseMoving = true;
+    clearTimeout(pauseRequest);
     const centerX = window.innerWidth / 2;
     const centerY = window.innerHeight / 2;
     const mouseX = event.clientX;
     const mouseY = event.clientY;
-    const angle = Math.atan2(mouseX - centerX, mouseY - centerY);
+    // const angle = Math.atan2(mouseX - centerX, mouseY - centerY);
     const angleDelta = getAngleBetween(centerX, centerY, previousMousePos[0], previousMousePos[1], mouseX, mouseY) * 180 / Math.PI;
-    console.log(angleDelta, angle, previousAngle);
-    rotationTotal += angleDelta;
-    console.log("total: ", rotationTotal);
-    previousAngle = angle;
+    // console.log(angleDelta, angle, previousAngle);
+    
+    // rotationTotal += angleDelta;
+    // console.log("total: ", rotationTotal);
+
+    // previousAngle = angle;
     previousMousePos = [mouseX, mouseY];
+    
+    console.log(angleDelta);
+    
+    if (angleDelta > 0.01) {
+      playGifClockwise();
+      // pauseRequest = setTimeout(5000, pauseGif);
+      // requestAnimationFrame(() => {
+      //   isMouseMoving = false;
+      //   requestAnimationFrame(() => {if (!isMouseMoving) pauseGif()});
+      // });
+    }
   }
   function setInitialAngle (event) {
     document.removeEventListener('mousemove', setInitialAngle);
-    const centerX = window.innerWidth / 2;
-    const centerY = window.innerHeight / 2;
+    // const centerX = window.innerWidth / 2;
+    // const centerY = window.innerHeight / 2;
     const mouseX = event.clientX;
     const mouseY = event.clientY;
-    previousAngle = Math.atan2(mouseX - centerX, mouseY - centerY);
+    // previousAngle = Math.atan2(mouseX - centerX, mouseY - centerY);
     previousMousePos = [mouseX, mouseY];
-    document.addEventListener('mousemove', getCursorAngleAroundCenter);
+    // document.addEventListener('mousemove', checkAngleChange);
   }
   
-  document.addEventListener('mousemove', setInitialAngle);
+  function setup () {
+    centerGif = document.querySelector('.seal-container');
+    document.addEventListener('mousemove', setInitialAngle);
+    console.log(centerGif);
+  }
+  
+  window.addEventListener('load', setup);
 </script>
