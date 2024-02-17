@@ -3,26 +3,20 @@
   </div>
 </body>
 <style>
+  body {
+    background-color: #F79862;
+  }
   p {
     position: fixed;
     left: 50%;
     top: 50%;
   }
-/* "Pausable gif" effect stolen from Junjun Zhang on https://codepen.io/zjun/pen/dGPqzQ */
-  @keyframes like-gif {
-    0% {
-      background-position: 0%;
-    }
-    100% {
-      background-position: 100%;
-    }
-  }
-  .paused {
+  /* .paused {
     animation-play-state: paused;
   }
   .reversed {
     animation-direction: reverse;
-  }
+  } */
   .seal-container {
     width: 200px;
     height: 207px;
@@ -31,10 +25,6 @@
     top: 50%;
     transform: translate(-50%, -50%);
     background-image: url("sheet-spinning-seal.png");
-    animation-name: like-gif;
-    animation-timing-function: steps(34);
-    animation-duration: 1.5s;
-    animation-iteration-count: infinite;
   }
 </style>
 <script>
@@ -44,12 +34,21 @@
   let centerGif;
   let isMouseMoving = false;
   let pauseRequest;
+  const stepAmount = 200;
+  const stepPercent = 100 / 34;
+  let currentSheetPercentage = 0;
+  
+  function stepGifFrame (percentChange) {
+    centerGif.style.backgroundPosition = (currentSheetPercentage + percentChange) + '%';
+    currentSheetPercentage += percentChange;
+  }
   
   function playGifClockwise () {
-    // centerGif.classList.remove('paused');
+    centerGif.classList.add('reversed');
+    centerGif.classList.remove('paused');
   }
   function playGifCounterclockwise () {
-    centerGif.classList.add('reversed');
+    centerGif.classList.remove('reversed');
     centerGif.classList.remove('paused');
   }
   function pauseGif () {
@@ -81,36 +80,21 @@
     const centerY = window.innerHeight / 2;
     const mouseX = event.clientX;
     const mouseY = event.clientY;
-    // const angle = Math.atan2(mouseX - centerX, mouseY - centerY);
     const angleDelta = getAngleBetween(centerX, centerY, previousMousePos[0], previousMousePos[1], mouseX, mouseY) * 180 / Math.PI;
-    // console.log(angleDelta, angle, previousAngle);
-    
-    // rotationTotal += angleDelta;
-    // console.log("total: ", rotationTotal);
-
-    // previousAngle = angle;
     previousMousePos = [mouseX, mouseY];
     
-    console.log(angleDelta);
-    
     if (angleDelta > 0.01) {
-      playGifClockwise();
-      // pauseRequest = setTimeout(5000, pauseGif);
-      // requestAnimationFrame(() => {
-      //   isMouseMoving = false;
-      //   requestAnimationFrame(() => {if (!isMouseMoving) pauseGif()});
-      // });
+      stepGifFrame(stepPercent * -1);
+    } else if (angleDelta < -0.01) {
+      stepGifFrame(stepPercent);
     }
   }
   function setInitialAngle (event) {
     document.removeEventListener('mousemove', setInitialAngle);
-    // const centerX = window.innerWidth / 2;
-    // const centerY = window.innerHeight / 2;
     const mouseX = event.clientX;
     const mouseY = event.clientY;
-    // previousAngle = Math.atan2(mouseX - centerX, mouseY - centerY);
     previousMousePos = [mouseX, mouseY];
-    // document.addEventListener('mousemove', checkAngleChange);
+    document.addEventListener('mousemove', checkAngleChange);
   }
   
   function setup () {
